@@ -4,6 +4,7 @@
         {
             "id": "6daab073-63fd-4d0d-b503-d2901af4f56a",
             "username": "user",
+            "email": "user@example.com",
             "emailVerified": true,
             "enabled": true,
             "credentials": [
@@ -23,6 +24,7 @@
         {
             "id": "6daab073-63fd-4d0d-b503-d2901af4f56b",
             "username": "admin",
+            "email": "admin@example.com",
             "emailVerified": true,
             "enabled": true,
             "credentials": [
