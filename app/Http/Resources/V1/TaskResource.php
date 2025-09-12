@@ -20,6 +20,7 @@ class TaskResource extends JsonResource
             'title' => $this->title,
             'status' => $this->status,
             'priority' => $this->priority,
+            /** @format date */
             'due_date' => $this->due_date?->format('Y-m-d'),
             'assignee' => new UserResource($this->assignee),
             'tags' => TagResource::collection($this->tags),
@@ -31,8 +32,8 @@ class TaskResource extends JsonResource
         return [
             'data' => [
                 'description' => $this->description,
-                'created_at' => $this->created_at,
-                'updated_at' => $this->updated_at,
+                'created_at' => $this->created_at->toRfc3339String(),
+                'updated_at' => $this->updated_at->toRfc3339String(),
                 'metadata' => $this->metadata,
             ],
         ];

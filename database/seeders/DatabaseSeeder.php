@@ -24,7 +24,12 @@ class DatabaseSeeder extends Seeder
         $user = User::factory()->create([
             'id' => '6daab073-63fd-4d0d-b503-d2901af4f56a',
             'name' => 'Test User',
-            'email' => 'test@example.com',
+            'email' => 'user@example.com',
+        ]);
+        User::factory()->create([
+            'id' => '6daab073-63fd-4d0d-b503-d2901af4f57b',
+            'name' => 'Another User',
+            'email' => 'anotheruser@example.com',
         ]);
 
         $onboardingTag = Tag::factory()->create([
