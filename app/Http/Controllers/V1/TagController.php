@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\V1;
 
 use App\Actions\Tag\CreateTag;
 use App\Actions\Tag\UpdateTag;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\Tag\CreateRequest;
 use App\Http\Requests\V1\Tag\UpdateRequest;
 use App\Http\Resources\V1\TagResource;
 use App\Models\Tag;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
 
 class TagController extends Controller
 {

@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\TagController;
-use App\Http\Controllers\TaskController;
+use App\Http\Controllers\V1\TagController;
+use App\Http\Controllers\V1\TaskController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->middleware('auth')->group(function () {
