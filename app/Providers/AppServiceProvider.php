@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use Dedoc\Scramble\Scramble;
+use Dedoc\Scramble\Support\Generator\OpenApi;
+use Dedoc\Scramble\Support\Generator\SecurityScheme;
+use Dedoc\Scramble\Support\Generator\SecuritySchemes\OAuthFlow;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +23,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Scramble::configure()
+            ->withDocumentTransformers(function (OpenApi $openApi) {
+                $openApi->secure(
+                    SecurityScheme::oauth2()
+                        ->flow('authorizationCode', function (OAuthFlow $flow) {
+                            $flow
+                                ->authorizationUrl(config('app.url') . '/auth/realms/sso/protocol/openid-connect/auth')
+                                ->tokenUrl(config('app.url') . '/auth/realms/sso/protocol/openid-connect/token')
+                                ->addScope('*', 'all');
+                        })
+                );
+            });
     }
 }
