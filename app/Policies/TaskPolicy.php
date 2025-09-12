@@ -54,7 +54,7 @@ class TaskPolicy
      */
     public function delete(User $user, Task $task): bool
     {
-        return false;
+        return $user->is($task->user);
     }
 
     /**

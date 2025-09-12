@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('tag_task', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('tag_id');
-            $table->unsignedBigInteger('task_id');
+            $table->foreignIdFor(\App\Models\Tag::class)->constrained();
+            $table->foreignIdFor(\App\Models\Task::class)->constrained();
             $table->timestamps();
+            $table->unique(['tag_id', 'task_id']);
         });
     }
 

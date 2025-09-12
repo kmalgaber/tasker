@@ -12,8 +12,6 @@ use Tests\TestCase;
 
 class TaskObserverTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function test_logs_created_task(): void
     {
         // Arrange
