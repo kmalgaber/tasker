@@ -6,11 +6,14 @@ use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use App\Observers\TaskObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
 #[ObservedBy(TaskObserver::class)]
 class Task extends Model
@@ -27,6 +30,18 @@ class Task extends Model
         'due_date' => 'date',
         'metadata' => 'array',
     ];
+
+    #[Scope]
+    public function dueDateBefore(Builder $query, string $date): void
+    {
+        $query->where('due_date', '<=', Carbon::parse($date));
+    }
+
+    #[Scope]
+    public function dueDateAfter(Builder $query, string $date): void
+    {
+        $query->where('due_date', '>=', Carbon::parse($date));
+    }
 
     public function user(): BelongsTo
     {

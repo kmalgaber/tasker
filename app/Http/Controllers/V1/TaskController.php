@@ -20,7 +20,7 @@ class TaskController extends Controller
     #[QueryParameter(name: "page", type: "integer")]
     #[QueryParameter(
         name: "filter[field]",
-        description: "Supported: status, priority, assignee_id, due_date, tags.name",
+        description: "Supported: status, priority, assignee_id, due_date_before, due_date_after, tags.name",
         type: "string",
         example: "filter[status]=completed"
     )]

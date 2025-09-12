@@ -36,6 +36,8 @@ class SearchTask
                 AllowedFilter::exact('priority'),
                 AllowedFilter::exact('assignee_id'),
                 AllowedFilter::exact('tags.name'),
+                AllowedFilter::scope('due_date_before'),
+                AllowedFilter::scope('due_date_after'),
             ])
             ->defaultSort('created_at')
             ->allowedSorts('created_at', 'due_date', 'title')

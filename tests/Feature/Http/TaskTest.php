@@ -97,6 +97,7 @@ class TaskTest extends TestCase
             'description' => 'Task 3 description',
             'status' => TaskStatus::Pending,
             'priority' => TaskPriority::Low,
+            'due_date' => '2020-03-14',
         ]);
 
         $task1->tags()->attach([$tag->getKey()]);
@@ -105,6 +106,7 @@ class TaskTest extends TestCase
         $filteredByTag = $this->actingAs($this->user)->getJson('tasks?filter[tags.name]=test');
         $filteredByStatus = $this->actingAs($this->user)->getJson('tasks?filter[status]=completed');
         $filteredByPriority = $this->actingAs($this->user)->getJson('tasks?filter[priority]=high');
+        $filteredByDueDateRange = $this->actingAs($this->user)->getJson('tasks?filter[due_date_after]=2019-09-30&filter[due_date_before]=2021-01-21');
         $filteredByAssignee = $this->actingAs($this->user)->getJson('tasks?filter[assignee_id]=' . $this->user->getKey());
 
         // Assert
@@ -138,6 +140,13 @@ class TaskTest extends TestCase
             'data' => [
                 [
                     'id' => $task2->getKey(),
+                ]
+            ],
+        ]);
+        $filteredByDueDateRange->assertSuccessful()->assertJsonCount(1, 'data')->assertJson([
+            'data' => [
+                [
+                    'id' => $task3->getKey(),
                 ]
             ],
         ]);
