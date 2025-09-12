@@ -30,6 +30,7 @@ class SearchTask
     public function execute(): LengthAwarePaginator
     {
         return QueryBuilder::for(Task::class)
+            ->with(['user', 'assignee', 'tags'])
             ->allowedFilters([
                 AllowedFilter::exact('status'),
                 AllowedFilter::exact('priority'),
