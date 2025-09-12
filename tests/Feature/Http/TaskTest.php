@@ -386,9 +386,10 @@ class TaskTest extends TestCase
             'title' => 'Task to be updated',
             'user_id' => $this->user->id,
             'status' => TaskStatus::Pending->value,
+            'priority' => TaskPriority::High->value,
         ]);
         $task2 = Task::factory()->create([
-            'title' => 'Task to be updated',
+            'title' => 'Task to be updated by admin',
             'user_id' => $this->user->id,
             'status' => TaskStatus::Pending->value,
         ]);
@@ -409,6 +410,7 @@ class TaskTest extends TestCase
         $this->assertDatabaseHas('tasks', [
             'title' => 'Task to be updated',
             'status' => TaskStatus::Completed->value,
+            'priority' => TaskPriority::High->value,
         ]);
     }
 

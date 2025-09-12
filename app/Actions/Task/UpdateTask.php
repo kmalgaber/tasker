@@ -32,14 +32,6 @@ class UpdateTask
      */
     public function execute(Task $task, array $data): Task
     {
-        if (!array_key_exists('status', $data)) {
-            $data['status'] = TaskStatus::Pending;
-        }
-        if (!array_key_exists('priority', $data)) {
-            $data['priority'] = TaskPriority::Medium;
-        }
-        $data['user_id'] = auth()->id();
-
         $task->update($this->filterAttributes($data));
 
         if (array_key_exists('tags', $data)) {
