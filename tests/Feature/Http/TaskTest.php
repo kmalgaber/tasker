@@ -73,6 +73,159 @@ class TaskTest extends TestCase
         ]);
     }
 
+    public function test_index_filtered(): void
+    {
+        // Arrange
+        $tag = Tag::factory()->create([
+            'name' => 'test',
+        ]);
+        $task1 = Task::factory()->create([
+            'title' => 'Task 1',
+            'description' => 'Task 1 description',
+            'status' => TaskStatus::Pending,
+            'priority' => TaskPriority::Medium,
+        ]);
+        $task2 = Task::factory()->create([
+            'title' => 'Task 2',
+            'description' => 'Task 2 description',
+            'status' => TaskStatus::Completed,
+            'priority' => TaskPriority::High,
+        ]);
+        $task3 = Task::factory()->create([
+            'assignee_id' => $this->user->getKey(),
+            'title' => 'Task 3',
+            'description' => 'Task 3 description',
+            'status' => TaskStatus::Pending,
+            'priority' => TaskPriority::Low,
+        ]);
+
+        $task1->tags()->attach([$tag->getKey()]);
+
+        // Act
+        $filteredByTag = $this->actingAs($this->user)->getJson('tasks?filter[tags.name]=test');
+        $filteredByStatus = $this->actingAs($this->user)->getJson('tasks?filter[status]=completed');
+        $filteredByPriority = $this->actingAs($this->user)->getJson('tasks?filter[priority]=high');
+        $filteredByAssignee = $this->actingAs($this->user)->getJson('tasks?filter[assignee_id]=' . $this->user->getKey());
+
+        // Assert
+        $filteredByTag->assertSuccessful()->assertJsonCount(1, 'data')->assertJson([
+            'data' => [
+                [
+                    'id' => $task1->getKey(),
+                ]
+            ],
+        ])->assertJsonMissing([
+            'data' => [
+                [
+                    'id' => $task2->getKey(),
+                ]
+            ]
+        ])->assertJsonMissing([
+            'data' => [
+                [
+                    'id' => $task3->getKey(),
+                ]
+            ]
+        ]);
+        $filteredByStatus->assertSuccessful()->assertJsonCount(1, 'data')->assertJson([
+            'data' => [
+                [
+                    'id' => $task2->getKey(),
+                ]
+            ],
+        ]);
+        $filteredByPriority->assertSuccessful()->assertJsonCount(1, 'data')->assertJson([
+            'data' => [
+                [
+                    'id' => $task2->getKey(),
+                ]
+            ],
+        ]);
+        $filteredByAssignee->assertSuccessful()->assertJsonCount(1, 'data')->assertJson([
+            'data' => [
+                [
+                    'id' => $task3->getKey(),
+                ]
+            ],
+        ]);
+    }
+
+    public function test_index_sorted(): void
+    {
+        // Arrange
+        $task1 = Task::factory()->create([
+            'title' => 'Task 1',
+            'description' => 'Task 1 description',
+            'status' => TaskStatus::Pending,
+            'priority' => TaskPriority::Medium,
+            'due_date' => now()->addDays(2)->toDateString(),
+            'created_at' => now()->subDays(30),
+        ]);
+        $task2 = Task::factory()->create([
+            'title' => 'Task 2',
+            'description' => 'Task 2 description',
+            'status' => TaskStatus::Completed,
+            'priority' => TaskPriority::High,
+            'due_date' => now()->addDay()->toDateString(),
+            'created_at' => now()->subDays(20),
+        ]);
+        $task3 = Task::factory()->create([
+            'assignee_id' => $this->user->getKey(),
+            'title' => 'Task 3',
+            'description' => 'Task 3 description',
+            'status' => TaskStatus::Pending,
+            'priority' => TaskPriority::Low,
+            'due_date' => now()->addDays(3)->toDateString(),
+            'created_at' => now()->subDays(10),
+        ]);
+
+        // Act
+        $sortedByCreatedAtDesc = $this->actingAs($this->user)->getJson('tasks?sort=-created_at');
+        $sortedByDueDate = $this->actingAs($this->user)->getJson('tasks?sort=due_date');
+        $sortedTitle = $this->actingAs($this->user)->getJson('tasks?sort=title');
+
+        // Assert
+        $sortedByCreatedAtDesc->assertSuccessful()->assertJson([
+            'data' => [
+                [
+                    'id' => $task3->getKey(),
+                ],
+                [
+                    'id' => $task2->getKey(),
+                ],
+                [
+                    'id' => $task1->getKey(),
+                ]
+            ]
+        ]);
+        $sortedByDueDate->assertSuccessful()->assertJson([
+            'data' => [
+                [
+                    'id' => $task2->getKey(),
+                ],
+                [
+                    'id' => $task1->getKey(),
+                ],
+                [
+                    'id' => $task3->getKey(),
+                ]
+            ]
+        ]);
+        $sortedTitle->assertSuccessful()->assertJson([
+            'data' => [
+                [
+                    'id' => $task1->getKey(),
+                ],
+                [
+                    'id' => $task2->getKey(),
+                ],
+                [
+                    'id' => $task3->getKey(),
+                ]
+            ]
+        ]);
+    }
+
     public function test_show(): void
     {
         // Arrange
