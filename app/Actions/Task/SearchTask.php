@@ -36,8 +36,7 @@ class SearchTask
         $query = QueryBuilder::for(Task::class)
             ->allowedFilters($allowedFilters)
             ->defaultSort('created_at')
-            ->allowedSorts($data['sort'] ?? [])
-            ->with(['user', 'assignee', 'tags']);
+            ->allowedSorts($data['sort'] ?? []);
         if (auth()->user()?->is_admin) {
             $query->withTrashed();
         }
