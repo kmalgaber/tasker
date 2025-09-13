@@ -32,28 +32,43 @@ class Task extends Model
         'metadata' => 'array',
     ];
 
+    /**
+     * @param  Builder<Task>  $query
+     */
     #[Scope]
     public function dueDateBefore(Builder $query, string $date): void
     {
         $query->where('due_date', '<=', Carbon::parse($date));
     }
 
+    /**
+     * @param  Builder<Task>  $query
+     */
     #[Scope]
     public function dueDateAfter(Builder $query, string $date): void
     {
         $query->where('due_date', '>=', Carbon::parse($date));
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function assignee(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * @return BelongsToMany<Tag, $this>
+     */
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class);

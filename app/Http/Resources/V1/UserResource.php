@@ -2,9 +2,13 @@
 
 namespace App\Http\Resources\V1;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin User
+ */
 class UserResource extends JsonResource
 {
     /**
@@ -20,7 +24,8 @@ class UserResource extends JsonResource
             'name' => $this->name,
             /** @format email */
             'email' => $this->email,
-            'email_verified_at' => $this->email_verified_at->toRfc3339String(),
+            // @phpstan-ignore-next-line
+            'email_verified_at' => $this->email_verified_at?->toRfc3339String(),
             /** @format uri */
             'avatar' => $this->avatar,
             'is_admin' => $this->is_admin,

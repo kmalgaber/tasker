@@ -25,12 +25,11 @@ class SearchTask
     /**
      * Execute the action.
      *
-     * @return mixed
+     * @return LengthAwarePaginator<int, Task>
      */
     public function execute(): LengthAwarePaginator
     {
         return QueryBuilder::for(Task::class)
-            ->with(['user', 'assignee', 'tags'])
             ->allowedFilters([
                 AllowedFilter::exact('status'),
                 AllowedFilter::exact('priority'),
@@ -41,6 +40,7 @@ class SearchTask
             ])
             ->defaultSort('created_at')
             ->allowedSorts('created_at', 'due_date', 'title')
+            ->with(['user', 'assignee', 'tags'])
             ->paginate();
     }
 }

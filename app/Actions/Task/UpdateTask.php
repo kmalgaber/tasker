@@ -22,6 +22,8 @@ class UpdateTask
 
     /**
      * Execute the action.
+     *
+     * @param  array<string, mixed>  $data
      */
     public function execute(Task $task, array $data): Task
     {
@@ -35,6 +37,10 @@ class UpdateTask
         return $task;
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
     private function filterAttributes(array $data): array
     {
         $nonAttributes = array_flip([

@@ -2,9 +2,13 @@
 
 namespace App\Http\Resources\V1;
 
+use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin Task
+ */
 class TaskResource extends JsonResource
 {
     /**
@@ -27,13 +31,16 @@ class TaskResource extends JsonResource
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function with($request): array
     {
         return [
             'data' => [
                 'description' => $this->description,
-                'created_at' => $this->created_at->toRfc3339String(),
-                'updated_at' => $this->updated_at->toRfc3339String(),
+                'created_at' => $this->created_at?->toRfc3339String(),
+                'updated_at' => $this->updated_at?->toRfc3339String(),
                 'metadata' => $this->metadata,
             ],
         ];

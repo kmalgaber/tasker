@@ -13,6 +13,9 @@ class Tag extends Model
 
     protected $guarded = [];
 
+    /**
+     * @return BelongsToMany<Task, $this>
+     */
     public function tasks(): BelongsToMany
     {
         return $this->belongsToMany(Task::class);

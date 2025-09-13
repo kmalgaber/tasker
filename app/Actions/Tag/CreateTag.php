@@ -21,6 +21,8 @@ class CreateTag
 
     /**
      * Execute the action.
+     *
+     * @param  array<string, mixed>  $data
      */
     public function execute(array $data): Tag
     {

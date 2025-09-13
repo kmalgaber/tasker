@@ -23,12 +23,15 @@ class SearchUser
     /**
      * Execute the action.
      *
-     * @return mixed
+     * @param  array<string, mixed>  $data
+     * @return LengthAwarePaginator<int, User>
      */
     public function execute(array $data): LengthAwarePaginator
     {
         return User::query()
+            // @phpstan-ignore-next-line
             ->whereLike('name', '%'.$data['keyword'].'%')
+            // @phpstan-ignore-next-line
             ->orWhereLike('email', '%'.$data['keyword'].'%')
             ->paginate();
     }
