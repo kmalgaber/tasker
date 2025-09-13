@@ -21,10 +21,6 @@ class CreateTag
 
     /**
      * Execute the action.
-     *
-     * @param array $data
-     *
-     * @return Tag
      */
     public function execute(array $data): Tag
     {

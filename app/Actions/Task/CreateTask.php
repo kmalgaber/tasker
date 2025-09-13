@@ -24,17 +24,13 @@ class CreateTask
 
     /**
      * Execute the action.
-     *
-     * @param array $data
-     *
-     * @return Task
      */
     public function execute(array $data): Task
     {
-        if (!array_key_exists('status', $data)) {
+        if (! array_key_exists('status', $data)) {
             $data['status'] = TaskStatus::Pending;
         }
-        if (!array_key_exists('priority', $data)) {
+        if (! array_key_exists('priority', $data)) {
             $data['priority'] = TaskPriority::Medium;
         }
         $data['user_id'] = auth()->id();
@@ -54,6 +50,7 @@ class CreateTask
         $nonAttributes = array_flip([
             'tags',
         ]);
-        return array_filter($data, fn($p) => !isset($nonAttributes[$p]), ARRAY_FILTER_USE_KEY);
+
+        return array_filter($data, fn ($p) => ! isset($nonAttributes[$p]), ARRAY_FILTER_USE_KEY);
     }
 }

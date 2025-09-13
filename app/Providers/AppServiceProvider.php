@@ -31,8 +31,8 @@ class AppServiceProvider extends ServiceProvider
                     SecurityScheme::oauth2()
                         ->flow('authorizationCode', function (OAuthFlow $flow) {
                             $flow
-                                ->authorizationUrl(config('app.url') . '/auth/realms/sso/protocol/openid-connect/auth')
-                                ->tokenUrl(config('app.url') . '/auth/realms/sso/protocol/openid-connect/token')
+                                ->authorizationUrl(config('app.url').'/auth/realms/sso/protocol/openid-connect/auth')
+                                ->tokenUrl(config('app.url').'/auth/realms/sso/protocol/openid-connect/token')
                                 ->addScope('*', 'all');
                         })
                 );

@@ -8,6 +8,7 @@ use Tests\TestCase;
 class UserTest extends TestCase
 {
     private User $user;
+
     private User $admin;
 
     protected function setUp(): void
@@ -49,7 +50,7 @@ class UserTest extends TestCase
                     'email_verified_at' => $this->user->email_verified_at->toRfc3339String(),
                     'avatar' => $this->user->avatar,
                     'is_admin' => $this->user->is_admin ?? false,
-                ]
+                ],
             ],
         ]);
     }

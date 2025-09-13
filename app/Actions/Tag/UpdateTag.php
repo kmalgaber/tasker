@@ -21,11 +21,6 @@ class UpdateTag
 
     /**
      * Execute the action.
-     *
-     * @param array $data
-     * @param Tag $tag
-     *
-     * @return Tag
      */
     public function execute(array $data, Tag $tag): Tag
     {

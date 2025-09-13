@@ -12,6 +12,7 @@ use Tests\TestCase;
 class TaskTest extends TestCase
 {
     private User $user;
+
     private User $admin;
 
     protected function setUp(): void
@@ -61,14 +62,14 @@ class TaskTest extends TestCase
                     'title' => 'Task 1',
                     'status' => TaskStatus::Pending->value,
                     'priority' => TaskPriority::Medium->value,
-                ]
+                ],
             ],
         ])->assertJsonMissing([
             'data' => [
                 [
                     'description' => 'Task 1 description',
                     'metadata' => [],
-                ]
+                ],
             ],
         ]);
     }
@@ -107,54 +108,54 @@ class TaskTest extends TestCase
         $filteredByStatus = $this->actingAs($this->user)->getJson('tasks?filter[status]=completed');
         $filteredByPriority = $this->actingAs($this->user)->getJson('tasks?filter[priority]=high');
         $filteredByDueDateRange = $this->actingAs($this->user)->getJson('tasks?filter[due_date_after]=2019-09-30&filter[due_date_before]=2021-01-21');
-        $filteredByAssignee = $this->actingAs($this->user)->getJson('tasks?filter[assignee_id]=' . $this->user->getKey());
+        $filteredByAssignee = $this->actingAs($this->user)->getJson('tasks?filter[assignee_id]='.$this->user->getKey());
 
         // Assert
         $filteredByTag->assertSuccessful()->assertJsonCount(1, 'data')->assertJson([
             'data' => [
                 [
                     'id' => $task1->getKey(),
-                ]
+                ],
             ],
         ])->assertJsonMissing([
             'data' => [
                 [
                     'id' => $task2->getKey(),
-                ]
-            ]
+                ],
+            ],
         ])->assertJsonMissing([
             'data' => [
                 [
                     'id' => $task3->getKey(),
-                ]
-            ]
+                ],
+            ],
         ]);
         $filteredByStatus->assertSuccessful()->assertJsonCount(1, 'data')->assertJson([
             'data' => [
                 [
                     'id' => $task2->getKey(),
-                ]
+                ],
             ],
         ]);
         $filteredByPriority->assertSuccessful()->assertJsonCount(1, 'data')->assertJson([
             'data' => [
                 [
                     'id' => $task2->getKey(),
-                ]
+                ],
             ],
         ]);
         $filteredByDueDateRange->assertSuccessful()->assertJsonCount(1, 'data')->assertJson([
             'data' => [
                 [
                     'id' => $task3->getKey(),
-                ]
+                ],
             ],
         ]);
         $filteredByAssignee->assertSuccessful()->assertJsonCount(1, 'data')->assertJson([
             'data' => [
                 [
                     'id' => $task3->getKey(),
-                ]
+                ],
             ],
         ]);
     }
@@ -204,8 +205,8 @@ class TaskTest extends TestCase
                 ],
                 [
                     'id' => $task1->getKey(),
-                ]
-            ]
+                ],
+            ],
         ]);
         $sortedByDueDate->assertSuccessful()->assertJson([
             'data' => [
@@ -217,8 +218,8 @@ class TaskTest extends TestCase
                 ],
                 [
                     'id' => $task3->getKey(),
-                ]
-            ]
+                ],
+            ],
         ]);
         $sortedTitle->assertSuccessful()->assertJson([
             'data' => [
@@ -230,8 +231,8 @@ class TaskTest extends TestCase
                 ],
                 [
                     'id' => $task3->getKey(),
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 
@@ -241,9 +242,9 @@ class TaskTest extends TestCase
         $task = Task::factory()->create();
 
         // Act
-        $this->getJson('tasks/' . $task->getKey())->assertUnauthorized();
-        $this->actingAs($this->admin)->getJson('tasks/' . $task->getKey())->assertSuccessful();
-        $response = $this->actingAs($this->user)->getJson('tasks/' . $task->getKey());
+        $this->getJson('tasks/'.$task->getKey())->assertUnauthorized();
+        $this->actingAs($this->admin)->getJson('tasks/'.$task->getKey())->assertSuccessful();
+        $response = $this->actingAs($this->user)->getJson('tasks/'.$task->getKey());
 
         // Assert
         $response->assertSuccessful()->assertJson([
@@ -352,12 +353,12 @@ class TaskTest extends TestCase
                     [
                         'name' => 'tag3',
                         'color' => '#0000ff',
-                    ]
+                    ],
                 ],
                 'metadata' => [
                     'foo' => 'bar',
                     'goo' => 'baz',
-                ]
+                ],
             ],
         ]);
 
@@ -408,10 +409,10 @@ class TaskTest extends TestCase
         $otherUser = User::factory()->create();
 
         // Act
-        $this->putJson('tasks/' . $task->getKey(), $updatedTaskData)->assertUnauthorized();
-        $this->actingAs($otherUser)->putJson('tasks/' . $task->getKey(), $updatedTaskData)->assertForbidden();
-        $this->actingAs($this->admin)->putJson('tasks/' . $task2->getKey(), $updatedTaskData)->assertSuccessful();
-        $response = $this->actingAs($this->user)->putJson('tasks/' . $task->getKey(), $updatedTaskData);
+        $this->putJson('tasks/'.$task->getKey(), $updatedTaskData)->assertUnauthorized();
+        $this->actingAs($otherUser)->putJson('tasks/'.$task->getKey(), $updatedTaskData)->assertForbidden();
+        $this->actingAs($this->admin)->putJson('tasks/'.$task2->getKey(), $updatedTaskData)->assertSuccessful();
+        $response = $this->actingAs($this->user)->putJson('tasks/'.$task->getKey(), $updatedTaskData);
 
         // Assert
         $response->assertSuccessful();
@@ -448,7 +449,7 @@ class TaskTest extends TestCase
         ];
 
         // Act
-        $response = $this->actingAs($this->user)->putJson('tasks/' . $task->getKey(), $taskData);
+        $response = $this->actingAs($this->user)->putJson('tasks/'.$task->getKey(), $taskData);
 
         // Assert
         $response->assertSuccessful()->assertJson([
@@ -482,12 +483,12 @@ class TaskTest extends TestCase
                     [
                         'name' => 'tag3',
                         'color' => '#0000ff',
-                    ]
+                    ],
                 ],
                 'metadata' => [
                     'foo' => 'bar',
                     'goo' => 'baz',
-                ]
+                ],
             ],
         ]);
 
@@ -532,10 +533,10 @@ class TaskTest extends TestCase
         $otherUser = User::factory()->create();
 
         // Act
-        $this->deleteJson('tasks/' . $task->getKey())->assertUnauthorized();
-        $this->actingAs($otherUser)->putJson('tasks/' . $task->getKey())->assertForbidden();
-        $this->actingAs($this->admin)->deleteJson('tasks/' . $task2->getKey())->assertNoContent();
-        $response = $this->actingAs($this->user)->deleteJson('tasks/' . $task->getKey());
+        $this->deleteJson('tasks/'.$task->getKey())->assertUnauthorized();
+        $this->actingAs($otherUser)->putJson('tasks/'.$task->getKey())->assertForbidden();
+        $this->actingAs($this->admin)->deleteJson('tasks/'.$task2->getKey())->assertNoContent();
+        $response = $this->actingAs($this->user)->deleteJson('tasks/'.$task->getKey());
 
         // Assert
         $response->assertNoContent();

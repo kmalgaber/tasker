@@ -9,6 +9,7 @@ use Tests\TestCase;
 class TagTest extends TestCase
 {
     private User $user;
+
     private User $admin;
 
     protected function setUp(): void
@@ -44,7 +45,7 @@ class TagTest extends TestCase
                 [
                     'name' => 'tag3',
                     'color' => '#0000ff',
-                ]
+                ],
             ],
         ]);
     }
@@ -82,10 +83,10 @@ class TagTest extends TestCase
         ]);
 
         // Act
-        $this->actingAs($this->user)->putJson('tags/' . $tag->getKey(), [
+        $this->actingAs($this->user)->putJson('tags/'.$tag->getKey(), [
             'color' => '#00ff00',
         ])->assertForbidden();
-        $response = $this->actingAs($this->admin)->putJson('tags/' . $tag->getKey(), [
+        $response = $this->actingAs($this->admin)->putJson('tags/'.$tag->getKey(), [
             'color' => '#00ff00',
         ]);
 
@@ -111,8 +112,8 @@ class TagTest extends TestCase
         ]);
 
         // Act
-        $this->actingAs($this->user)->deleteJson('tags/' . $tag->getKey())->assertForbidden();
-        $this->actingAs($this->admin)->deleteJson('tags/' . $tag->getKey())->assertNoContent();
+        $this->actingAs($this->user)->deleteJson('tags/'.$tag->getKey())->assertForbidden();
+        $this->actingAs($this->admin)->deleteJson('tags/'.$tag->getKey())->assertNoContent();
 
         // Assert
         $this->assertDatabaseMissing('tags', [

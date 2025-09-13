@@ -2,8 +2,6 @@
 
 namespace App\Actions\Task;
 
-use App\Enums\TaskPriority;
-use App\Enums\TaskStatus;
 use App\Models\Tag;
 use App\Models\Task;
 use Spatie\QueueableAction\QueueableAction;
@@ -24,11 +22,6 @@ class UpdateTask
 
     /**
      * Execute the action.
-     *
-     * @param Task $task
-     * @param array $data
-     *
-     * @return Task
      */
     public function execute(Task $task, array $data): Task
     {
@@ -47,6 +40,7 @@ class UpdateTask
         $nonAttributes = array_flip([
             'tags',
         ]);
-        return array_filter($data, fn($p) => !isset($nonAttributes[$p]), ARRAY_FILTER_USE_KEY);
+
+        return array_filter($data, fn ($p) => ! isset($nonAttributes[$p]), ARRAY_FILTER_USE_KEY);
     }
 }

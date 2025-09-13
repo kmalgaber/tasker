@@ -6,8 +6,6 @@ use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use App\Models\Task;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class TaskObserverTest extends TestCase

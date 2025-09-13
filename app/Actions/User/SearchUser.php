@@ -4,7 +4,6 @@ namespace App\Actions\User;
 
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Collection;
 use Spatie\QueueableAction\QueueableAction;
 
 class SearchUser
@@ -29,8 +28,8 @@ class SearchUser
     public function execute(array $data): LengthAwarePaginator
     {
         return User::query()
-            ->whereLike('name', '%' . $data['keyword'] . '%')
-            ->orWhereLike('email', '%' . $data['keyword'] . '%')
+            ->whereLike('name', '%'.$data['keyword'].'%')
+            ->orWhereLike('email', '%'.$data['keyword'].'%')
             ->paginate();
     }
 }

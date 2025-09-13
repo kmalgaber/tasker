@@ -20,6 +20,7 @@ class Task extends Model
 {
     /** @use HasFactory<\Database\Factories\TaskFactory> */
     use HasFactory;
+
     use SoftDeletes;
 
     protected $guarded = [];

@@ -17,18 +17,18 @@ use Illuminate\Support\Facades\Gate;
 
 class TaskController extends Controller
 {
-    #[QueryParameter(name: "page", type: "integer")]
+    #[QueryParameter(name: 'page', type: 'integer')]
     #[QueryParameter(
-        name: "filter[field]",
-        description: "Supported: status, priority, assignee_id, due_date_before, due_date_after, tags.name",
-        type: "string",
-        example: "filter[status]=completed"
+        name: 'filter[field]',
+        description: 'Supported: status, priority, assignee_id, due_date_before, due_date_after, tags.name',
+        type: 'string',
+        example: 'filter[status]=completed'
     )]
     #[QueryParameter(
-        name: "sort",
+        name: 'sort',
         description: "Put '-' in front of the field name for reverse ordering",
-        type: "string",
-        example: "-title"
+        type: 'string',
+        example: '-title'
     )]
     public function index(SearchTask $action): ResourceCollection
     {

@@ -14,7 +14,7 @@ class TagTest extends TestCase
         parent::setUp();
 
         $tag = Tag::factory()->create([
-            'name' => 'test'
+            'name' => 'test',
         ]);
         $tasks = Task::factory()->count(3)->create();
 
