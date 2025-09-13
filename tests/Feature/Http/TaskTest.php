@@ -100,11 +100,19 @@ class TaskTest extends TestCase
             'status' => TaskStatus::Pending,
             'priority' => TaskPriority::Medium,
         ]);
+        Task::factory()->create([
+            'title' => 'Translate',
+            'description' => 'Localize the project',
+            'metadata' => [
+                'language' => 'azerbaijan',
+            ],
+        ]);
 
         // Act
         $this->actingAs($this->user)->getJson('tasks?filter[text]=task 7')->assertJsonCount(1, 'data');
         $this->actingAs($this->user)->getJson('tasks?filter[text]=desription')->assertJsonCount(1, 'data');
         $this->actingAs($this->user)->getJson('tasks?filter[text]=irrelevant')->assertJsonCount(0, 'data');
+        $this->actingAs($this->user)->getJson('tasks?filter[text]=aze')->assertJsonCount(1, 'data');
     }
 
     public function test_index_filtered(): void
