@@ -33,13 +33,14 @@ class SearchTask
     {
         $allowedFilters = $this->buildAllowedFilters($data);
 
+        if (auth()->user()?->is_admin) {
+            $allowedFilters += [AllowedFilter::trashed()];
+        }
+
         $query = QueryBuilder::for(Task::class)
             ->allowedFilters($allowedFilters)
             ->defaultSort('created_at')
             ->allowedSorts($data['sort'] ?? []);
-        if (auth()->user()?->is_admin) {
-            $query->withTrashed();
-        }
 
         return $query->paginate();
     }
@@ -53,7 +54,7 @@ class SearchTask
         return isset($data['filter']) ? array_map(
             fn ($key) => method_exists(Task::class, Str::camel($key)) ?
                 AllowedFilter::scope($key) : AllowedFilter::exact($key),
-            array_keys($data['filter'])
+            array_filter(array_keys($data['filter']), fn ($key) => $key !== 'trashed')
         ) : [];
     }
 }

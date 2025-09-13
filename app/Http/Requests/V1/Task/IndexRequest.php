@@ -30,7 +30,9 @@ class IndexRequest extends FormRequest
                 Rule::when($this->filled('filter.due_date_before'), 'before_or_equal:filter.due_date_before'),
             ],
             'filter.tags\.name' => 'exists:tags,name',
-            'sort' => 'string',
+            /** Admins can request for deleted records */
+            'filter.trashed' => 'in:only,with',
+            'sort' => 'in:title,-title,due_date,-due_date,created_at,-created_at',
         ];
     }
 }

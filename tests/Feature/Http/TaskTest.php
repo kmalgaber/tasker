@@ -34,32 +34,12 @@ class TaskTest extends TestCase
             'status' => TaskStatus::Pending,
             'priority' => TaskPriority::Medium,
         ]);
-        $task2 = Task::factory()->create([
-            'user_id' => $this->user->getKey(),
-            'title' => 'Task 2',
-            'description' => 'Task 2 description',
-            'deleted_at' => now(),
-        ]);
 
         // Act
         $this->getJson('tasks')->assertUnauthorized();
-        $responseForAdmin = $this->actingAs($this->admin)->getJson('tasks');
-
         $response = $this->actingAs($this->user)->getJson('tasks');
 
         // Assert
-        $responseForAdmin->assertSuccessful()->assertJsonCount(2, 'data')->assertJson([
-            'data' => [
-                [
-                    'id' => $task1->getKey(),
-                    'deleted_at' => null,
-                ],
-                [
-                    'id' => $task2->getKey(),
-                    'deleted_at' => $task2->deleted_at?->toRfc3339String(),
-                ],
-            ],
-        ]);
         $response->assertSuccessful()->assertJsonCount(1, 'data')->assertJson([
             'data' => [
                 [
@@ -82,6 +62,31 @@ class TaskTest extends TestCase
             'metadata' => [],
             'title' => 'Task 2',
             'deleted_at' => null,
+        ]);
+    }
+
+    public function test_index_soft_deleted(): void
+    {
+        // Arrange
+        $task = Task::factory()->create([
+            'user_id' => $this->user->getKey(),
+            'title' => 'Task',
+            'description' => 'Task description',
+            'deleted_at' => now(),
+        ]);
+
+        // Act
+        $this->actingAs($this->user)->getJson('tasks?filter[trashed]=only')->assertBadRequest();
+        $responseForAdmin = $this->actingAs($this->admin)->getJson('tasks?filter[trashed]=only');
+
+        // Assert
+        $responseForAdmin->assertSuccessful()->assertJsonCount(1, 'data')->assertJson([
+            'data' => [
+                [
+                    'id' => $task->getKey(),
+                    'deleted_at' => $task->deleted_at?->toRfc3339String(),
+                ],
+            ],
         ]);
     }
 
