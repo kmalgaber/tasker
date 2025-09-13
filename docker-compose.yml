@@ -12,7 +12,7 @@ services:
             - php-fpm
         extra_hosts:
             - 'host.docker.internal:host-gateway'
-            - 'tasker.dev:host-gateway'
+            - '${APP_DOMAIN}:host-gateway'
         environment:
             WWWUSER: '${WWWUSER}'
             LARAVEL_SAIL: 1
@@ -47,7 +47,7 @@ services:
             - '-f'
         extra_hosts:
             - 'host.docker.internal:host-gateway'
-            - 'tasker.dev:host-gateway'
+            - '${APP_DOMAIN}:host-gateway'
         environment:
             WWWUSER: '${WWWUSER}'
             LARAVEL_SAIL: 1
@@ -74,7 +74,7 @@ services:
             - 'queue:listen'
         extra_hosts:
             - 'host.docker.internal:host-gateway'
-            - 'tasker.dev:host-gateway'
+            - '${APP_DOMAIN}:host-gateway'
         environment:
             WWWUSER: '${WWWUSER}'
             LARAVEL_SAIL: 1
@@ -105,7 +105,7 @@ services:
         networks:
             - default
             - sail
-            - sail-external
+            - tasker
     mysql:
         image: 'mysql/mysql-server:8.0'
         ports:
@@ -144,7 +144,7 @@ services:
             - start-dev
             - '--import-realm'
         extra_hosts:
-            - 'tasker.dev:host-gateway'
+            - '${APP_DOMAIN}:host-gateway'
         environment:
             KEYCLOAK_ADMIN: '${KEYCLOAK_ADMIN_USER_NAME:-admin}'
             KEYCLOAK_ADMIN_PASSWORD: '${KEYCLOAK_ADMIN_PASSWORD:-password}'
@@ -158,6 +158,8 @@ services:
             KC_METRICS_ENABLED: true
             KC_HEALTH_ENABLED: true
             KC_LOG: file
+        env_file:
+            -   .env
         restart: on-failure
     redis:
         image: 'redis:alpine'
@@ -190,7 +192,7 @@ services:
             - '--debug'
         extra_hosts:
             - 'host.docker.internal:host-gateway'
-            - 'tasker.dev:host-gateway'
+            - '${APP_DOMAIN}:host-gateway'
         environment:
             WWWUSER: '${WWWUSER}'
             LARAVEL_SAIL: 1
@@ -239,7 +241,7 @@ services:
 networks:
     sail:
         driver: bridge
-    sail-external:
+    tasker:
         external: true
 volumes:
     sail-mysql:

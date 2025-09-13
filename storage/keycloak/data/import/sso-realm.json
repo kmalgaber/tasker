@@ -11,17 +11,17 @@
         }
     ],
     "smtpServer": {
-        "password": "password",
+        "password": "${MAIL_PASSWORD}",
         "replyToDisplayName": "",
         "starttls": "true",
         "auth": "true",
-        "port": "465",
+        "port": "${MAIL_HOST}",
         "replyTo": "",
-        "host": "mailpit",
-        "from": "auth@tasker.dev",
-        "fromDisplayName": "Tasker Auth",
+        "host": "${MAIL_HOST}",
+        "from": "${MAIL_FROM_ADDRESS}",
+        "fromDisplayName": "${MAIL_FROM_NAME}",
         "envelopeFrom": "",
         "ssl": "true",
-        "user": "sail"
+        "user": "${MAIL_USERNAME}"
     }
 }
