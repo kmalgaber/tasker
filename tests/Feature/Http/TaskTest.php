@@ -38,16 +38,29 @@ class TaskTest extends TestCase
             'user_id' => $this->user->getKey(),
             'title' => 'Task 2',
             'description' => 'Task 2 description',
+            'deleted_at' => now(),
         ]);
 
         // Act
         $this->getJson('tasks')->assertUnauthorized();
-        $this->actingAs($this->admin)->getJson('tasks')->assertSuccessful();
+        $responseForAdmin = $this->actingAs($this->admin)->getJson('tasks');
 
         $response = $this->actingAs($this->user)->getJson('tasks');
 
         // Assert
-        $response->assertSuccessful()->assertJsonCount(2, 'data')->assertJson([
+        $responseForAdmin->assertSuccessful()->assertJsonCount(2, 'data')->assertJson([
+            'data' => [
+                [
+                    'id' => $task1->getKey(),
+                    'deleted_at' => null,
+                ],
+                [
+                    'id' => $task2->getKey(),
+                    'deleted_at' => $task2->deleted_at?->toRfc3339String(),
+                ],
+            ],
+        ]);
+        $response->assertSuccessful()->assertJsonCount(1, 'data')->assertJson([
             'data' => [
                 [
                     'id' => $task1->getKey(),
@@ -65,12 +78,10 @@ class TaskTest extends TestCase
                 ],
             ],
         ])->assertJsonMissing([
-            'data' => [
-                [
-                    'description' => 'Task 1 description',
-                    'metadata' => [],
-                ],
-            ],
+            'description' => 'Task 1 description',
+            'metadata' => [],
+            'title' => 'Task 2',
+            'deleted_at' => null,
         ]);
     }
 
@@ -551,6 +562,38 @@ class TaskTest extends TestCase
         ]);
         $this->assertSoftDeleted('tasks', [
             'title' => 'Task to be deleted by admin',
+        ]);
+    }
+
+    public function test_restore(): void
+    {
+        // Arrange
+        $task = Task::factory()->create([
+            'deleted_at' => now()->subDays(5)->toDateString(),
+        ]);
+
+        // Act
+        $this->patchJson('tasks/'.$task->getKey())->assertUnauthorized();
+        $this->actingAs($this->user)->patchJson('tasks/'.$task->getKey())->assertForbidden();
+        $response = $this->actingAs($this->admin)->patchJson('tasks/'.$task->getKey());
+
+        // Assert
+        $response->assertSuccessful()->assertJson([
+            'data' => [
+                'id' => $task->getKey(),
+                'title' => $task->title,
+                'description' => $task->description,
+                'status' => $task->status->value,
+                'priority' => $task->priority->value,
+                'due_date' => $task->due_date?->rfc3339String(),
+                'metadata' => [],
+                'deleted_at' => null,
+            ],
+        ]);
+
+        $this->assertDatabaseHas('tasks', [
+            'id' => $task->getKey(),
+            'deleted_at' => null,
         ]);
     }
 }

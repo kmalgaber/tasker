@@ -20,7 +20,12 @@ class TaskObserver
 
     public function updating(Task $task): bool
     {
-        if (Task::query()->where('id', $task->getKey())->select('version')->first()?->version != $task->version) {
+        if (Task::query()
+            ->withTrashed()
+            ->where('id', $task->getKey())
+            ->select('version')
+            ->first()
+            ?->version != $task->version) {
             return false;
         }
         $task->version += 1;

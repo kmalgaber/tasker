@@ -29,7 +29,7 @@ class SearchTask
      */
     public function execute(): LengthAwarePaginator
     {
-        return QueryBuilder::for(Task::class)
+        $query = QueryBuilder::for(Task::class)
             ->allowedFilters([
                 AllowedFilter::exact('status'),
                 AllowedFilter::exact('priority'),
@@ -40,7 +40,11 @@ class SearchTask
             ])
             ->defaultSort('created_at')
             ->allowedSorts('created_at', 'due_date', 'title')
-            ->with(['user', 'assignee', 'tags'])
-            ->paginate();
+            ->with(['user', 'assignee', 'tags']);
+        if (auth()->user()?->is_admin) {
+            $query->withTrashed();
+        }
+
+        return $query->paginate();
     }
 }

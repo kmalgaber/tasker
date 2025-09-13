@@ -70,4 +70,13 @@ class TaskController extends Controller
 
         return response()->noContent();
     }
+
+    public function restore(Task $task): TaskResource
+    {
+        Gate::authorize('restore', $task);
+
+        $task->restore();
+
+        return new TaskResource($task);
+    }
 }

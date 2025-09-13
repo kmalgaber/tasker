@@ -24,6 +24,7 @@ class UserResource extends JsonResource
             'name' => $this->name,
             /** @format email */
             'email' => $this->email,
+            /** @format date-time */
             // @phpstan-ignore-next-line
             'email_verified_at' => $this->email_verified_at?->toRfc3339String(),
             /** @format uri */

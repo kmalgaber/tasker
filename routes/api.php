@@ -10,3 +10,6 @@ Route::prefix('v1')->middleware('auth')->group(function () {
     Route::resource('tasks', TaskController::class);
     Route::resource('tags', TagController::class);
 });
+
+// withTrashed() does not work when the route is defined inside the group
+Route::middleware('auth')->patch('/v1/tasks/{task}', [TaskController::class, 'restore'])->withTrashed();
