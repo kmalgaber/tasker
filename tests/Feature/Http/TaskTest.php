@@ -415,12 +415,17 @@ class TaskTest extends TestCase
         $response = $this->actingAs($this->user)->putJson('tasks/'.$task->getKey(), $updatedTaskData);
 
         // Assert
-        $response->assertSuccessful();
+        $response->assertSuccessful()->assertJson([
+            'data' => [
+                'status' => TaskStatus::Completed->value,
+            ],
+        ]);
 
         $this->assertDatabaseHas('tasks', [
             'title' => 'Task to be updated',
             'status' => TaskStatus::Completed->value,
             'priority' => TaskPriority::High->value,
+            'version' => 2,
         ]);
     }
 

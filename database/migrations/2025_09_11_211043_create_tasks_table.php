@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,17 +14,17 @@ return new class extends Migration
     {
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(\App\Models\User::class)->constrained();
+            $table->foreignIdFor(User::class)->constrained();
             $table->string('title');
             $table->text('description')->nullable();
             $table->string('status');
             $table->string('priority');
             $table->date('due_date')->nullable();
-            $table->foreignIdFor(\App\Models\User::class, 'assignee_id')->nullable()->constrained();
+            $table->foreignIdFor(User::class, 'assignee_id')->nullable()->constrained();
             $table->json('metadata')->nullable();
             $table->softDeletes();
             $table->timestamps();
-            $table->integer('version')->default(1);
+            $table->unsignedBigInteger('version')->default(1);
         });
     }
 

@@ -18,6 +18,16 @@ class TaskObserver
             ->log('task created');
     }
 
+    public function updating(Task $task): bool
+    {
+        if (Task::query()->where('id', $task->getKey())->select('version')->first()?->version != $task->version) {
+            return false;
+        }
+        $task->version += 1;
+
+        return true;
+    }
+
     /**
      * Handle the Task "updated" event.
      */

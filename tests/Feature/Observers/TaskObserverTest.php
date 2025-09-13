@@ -52,7 +52,7 @@ class TaskObserverTest extends TestCase
             'description' => fake()->text,
             'status' => TaskStatus::Pending->value,
             'priority' => TaskPriority::Low->value,
-        ]);
+        ])->fresh();
 
         // Act
         $this->actingAs($user);
