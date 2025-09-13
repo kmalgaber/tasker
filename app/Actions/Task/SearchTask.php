@@ -33,6 +33,10 @@ class SearchTask
     {
         $allowedFilters = $this->buildAllowedFilters($data);
 
+        if (isset($data['filter']['tags'])) {
+            $allowedFilters += [AllowedFilter::exact('tags', 'tags.name')];
+        }
+
         if (auth()->user()?->is_admin) {
             $allowedFilters += [AllowedFilter::trashed()];
         }
@@ -54,7 +58,7 @@ class SearchTask
         return isset($data['filter']) ? array_map(
             fn ($key) => method_exists(Task::class, Str::camel($key)) ?
                 AllowedFilter::scope($key) : AllowedFilter::exact($key),
-            array_filter(array_keys($data['filter']), fn ($key) => $key !== 'trashed')
+            array_values(array_filter(array_keys($data['filter']), fn ($key) => ! in_array($key, ['trashed', 'tags'])))
         ) : [];
     }
 }

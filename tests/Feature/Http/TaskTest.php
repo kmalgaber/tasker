@@ -113,6 +113,9 @@ class TaskTest extends TestCase
         $tag = Tag::factory()->create([
             'name' => 'test',
         ]);
+        Tag::factory()->create([
+            'name' => 'test2',
+        ]);
         $task1 = Task::factory()->create([
             'title' => 'Task 1',
             'description' => 'Task 1 description',
@@ -144,7 +147,7 @@ class TaskTest extends TestCase
         $task1->tags()->attach([$tag->getKey()]);
 
         // Act
-        $filteredByTag = $this->actingAs($this->user)->getJson('tasks?filter[tags.name]=test');
+        $filteredByTag = $this->actingAs($this->user)->getJson('tasks?filter[tags][]=test2&filter[tags][]=test');
         $filteredByStatus = $this->actingAs($this->user)->getJson('tasks?filter[status]=completed');
         $filteredByPriority = $this->actingAs($this->user)->getJson('tasks?filter[priority]=high');
         $filteredByDueDateRange = $this->actingAs($this->user)->getJson('tasks?filter[due_date_after]=2019-09-30&filter[due_date_before]=2021-01-21');

@@ -11,7 +11,6 @@ use App\Http\Requests\V1\Task\IndexRequest;
 use App\Http\Requests\V1\Task\UpdateRequest;
 use App\Http\Resources\V1\TaskResource;
 use App\Models\Task;
-use Dedoc\Scramble\Attributes\QueryParameter;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
