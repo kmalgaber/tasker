@@ -3,6 +3,7 @@
 namespace Tests\Feature\Http;
 
 use App\Models\Tag;
+use App\Models\Task;
 use App\Models\User;
 use Tests\TestCase;
 
@@ -110,6 +111,8 @@ class TagTest extends TestCase
             'name' => 'tag1',
             'color' => '#ff0000',
         ]);
+        $task = Task::factory()->create();
+        $task->tags()->sync([$tag->getKey()]);
 
         // Act
         $this->actingAs($this->user)->deleteJson('tags/'.$tag->getKey())->assertForbidden();

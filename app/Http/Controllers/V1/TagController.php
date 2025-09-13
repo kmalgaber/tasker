@@ -56,6 +56,8 @@ class TagController extends Controller
     {
         Gate::authorize('delete', $tag);
 
+        $tag->tasks()->detach();
+
         $tag->delete();
 
         return response()->noContent();
