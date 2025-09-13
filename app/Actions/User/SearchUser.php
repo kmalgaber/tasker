@@ -30,9 +30,9 @@ class SearchUser
     {
         return User::query()
             // @phpstan-ignore-next-line
-            ->whereLike('name', '%'.$data['keyword'].'%')
+            ->whereLike('name', '%'.$data['search'].'%')
             // @phpstan-ignore-next-line
-            ->orWhereLike('email', '%'.$data['keyword'].'%')
+            ->orWhereLike('email', '%'.$data['search'].'%')
             ->paginate();
     }
 }

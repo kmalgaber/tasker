@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Laravel\Scout\Searchable;
 
 #[ObservedBy(TaskObserver::class)]
 class Task extends Model
@@ -21,6 +22,7 @@ class Task extends Model
     /** @use HasFactory<\Database\Factories\TaskFactory> */
     use HasFactory;
 
+    use Searchable;
     use SoftDeletes;
 
     protected $guarded = [];
@@ -31,6 +33,20 @@ class Task extends Model
         'due_date' => 'date',
         'metadata' => 'array',
     ];
+
+    /**
+     * @param  Builder<Task>  $query
+     */
+    #[Scope]
+    public function text(Builder $query, string $search): void
+    {
+        $query->whereIn(
+            'id',
+            self::search($search)
+                ->get()
+                ->pluck('id'),
+        );
+    }
 
     /**
      * @param  Builder<Task>  $query

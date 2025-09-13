@@ -7,6 +7,7 @@ use App\Actions\Task\SearchTask;
 use App\Actions\Task\UpdateTask;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\Task\CreateRequest;
+use App\Http\Requests\V1\Task\IndexRequest;
 use App\Http\Requests\V1\Task\UpdateRequest;
 use App\Http\Resources\V1\TaskResource;
 use App\Models\Task;
@@ -20,7 +21,7 @@ class TaskController extends Controller
     #[QueryParameter(name: 'page', type: 'integer')]
     #[QueryParameter(
         name: 'filter[field]',
-        description: 'Supported: status, priority, assignee_id, due_date_before, due_date_after, tags.name',
+        description: 'Supported fields: search, status, priority, assignee_id, due_date_before, due_date_after, tags.name',
         type: 'string',
         example: 'filter[status]=completed'
     )]
@@ -30,11 +31,14 @@ class TaskController extends Controller
         type: 'string',
         example: '-title'
     )]
-    public function index(SearchTask $action): ResourceCollection
+    public function index(IndexRequest $request, SearchTask $action): ResourceCollection
     {
         Gate::authorize('viewAny', Task::class);
 
-        return TaskResource::collection($action->execute());
+        /** @var array{filter?:array<string, mixed>, sort?: string, page?: int} $data */
+        $data = $request->validated();
+
+        return TaskResource::collection($action->execute($data));
     }
 
     public function store(CreateRequest $request, CreateTask $action): TaskResource

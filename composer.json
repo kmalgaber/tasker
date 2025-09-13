@@ -12,9 +12,12 @@
         "php": "^8.2",
         "dedoc/scramble": "^0.12.34",
         "devadamlar/laravel-oidc": "^1.1",
+        "http-interop/http-factory-guzzle": "^1.2",
         "laravel/framework": "^12.0",
         "laravel/reverb": "^1.0",
+        "laravel/scout": "^10.19",
         "laravel/tinker": "^2.10.1",
+        "meilisearch/meilisearch-php": "^1.16",
         "spatie/laravel-activitylog": "^4.10",
         "spatie/laravel-query-builder": "^6.3",
         "spatie/laravel-queueable-action": "^2.16"

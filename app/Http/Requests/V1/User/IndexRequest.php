@@ -15,7 +15,7 @@ class IndexRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'keyword' => 'string',
+            'search' => 'string',
         ];
     }
 }

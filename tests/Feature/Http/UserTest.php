@@ -37,8 +37,8 @@ class UserTest extends TestCase
 
         // Act
         $this->getJson('users')->assertUnauthorized();
-        $this->actingAs($this->admin)->getJson('users?keyword=est')->assertSuccessful();
-        $response = $this->actingAs($this->user)->getJson('users?keyword=est');
+        $this->actingAs($this->admin)->getJson('users?search=est')->assertSuccessful();
+        $response = $this->actingAs($this->user)->getJson('users?search=est');
 
         // Assert
         $response->assertSuccessful()->assertJsonCount(2, 'data')->assertJson([

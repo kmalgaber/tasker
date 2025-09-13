@@ -85,6 +85,23 @@ class TaskTest extends TestCase
         ]);
     }
 
+    public function test_index_search(): void
+    {
+        // Arrange
+        Task::factory()->create([
+            'user_id' => $this->user->getKey(),
+            'title' => 'Task 1',
+            'description' => 'Description',
+            'status' => TaskStatus::Pending,
+            'priority' => TaskPriority::Medium,
+        ]);
+
+        // Act
+        $this->actingAs($this->user)->getJson('tasks?filter[text]=task 7')->assertJsonCount(1, 'data');
+        $this->actingAs($this->user)->getJson('tasks?filter[text]=desription')->assertJsonCount(1, 'data');
+        $this->actingAs($this->user)->getJson('tasks?filter[text]=irrelevant')->assertJsonCount(0, 'data');
+    }
+
     public function test_index_filtered(): void
     {
         // Arrange
@@ -111,6 +128,13 @@ class TaskTest extends TestCase
             'priority' => TaskPriority::Low,
             'due_date' => '2020-03-14',
         ]);
+        $task4 = Task::factory()->create([
+            'title' => 'Task in a future',
+            'description' => 'Description of a future task',
+            'status' => TaskStatus::Pending,
+            'priority' => TaskPriority::Low,
+            'due_date' => '2026-10-14',
+        ]);
 
         $task1->tags()->attach([$tag->getKey()]);
 
@@ -119,6 +143,7 @@ class TaskTest extends TestCase
         $filteredByStatus = $this->actingAs($this->user)->getJson('tasks?filter[status]=completed');
         $filteredByPriority = $this->actingAs($this->user)->getJson('tasks?filter[priority]=high');
         $filteredByDueDateRange = $this->actingAs($this->user)->getJson('tasks?filter[due_date_after]=2019-09-30&filter[due_date_before]=2021-01-21');
+        $filteredByDueDateRange2 = $this->actingAs($this->user)->getJson('tasks?filter[due_date_after]=2026-09-30');
         $filteredByAssignee = $this->actingAs($this->user)->getJson('tasks?filter[assignee_id]='.$this->user->getKey());
 
         // Assert
@@ -159,6 +184,13 @@ class TaskTest extends TestCase
             'data' => [
                 [
                     'id' => $task3->getKey(),
+                ],
+            ],
+        ]);
+        $filteredByDueDateRange2->assertSuccessful()->assertJsonCount(1, 'data')->assertJson([
+            'data' => [
+                [
+                    'id' => $task4->getKey(),
                 ],
             ],
         ]);

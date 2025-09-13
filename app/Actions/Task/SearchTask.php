@@ -4,6 +4,7 @@ namespace App\Actions\Task;
 
 use App\Models\Task;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Str;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueueableAction\QueueableAction;
@@ -25,26 +26,35 @@ class SearchTask
     /**
      * Execute the action.
      *
+     * @param  array{filter?:array<string, mixed>, sort?: string, page?: int}  $data
      * @return LengthAwarePaginator<int, Task>
      */
-    public function execute(): LengthAwarePaginator
+    public function execute(array $data): LengthAwarePaginator
     {
+        $allowedFilters = $this->buildAllowedFilters($data);
+
         $query = QueryBuilder::for(Task::class)
-            ->allowedFilters([
-                AllowedFilter::exact('status'),
-                AllowedFilter::exact('priority'),
-                AllowedFilter::exact('assignee_id'),
-                AllowedFilter::exact('tags.name'),
-                AllowedFilter::scope('due_date_before'),
-                AllowedFilter::scope('due_date_after'),
-            ])
+            ->allowedFilters($allowedFilters)
             ->defaultSort('created_at')
-            ->allowedSorts('created_at', 'due_date', 'title')
+            ->allowedSorts($data['sort'] ?? [])
             ->with(['user', 'assignee', 'tags']);
         if (auth()->user()?->is_admin) {
             $query->withTrashed();
         }
 
         return $query->paginate();
+    }
+
+    /**
+     * @param  array{filter?:array<string, mixed>}  $data
+     * @return list<AllowedFilter>
+     */
+    private function buildAllowedFilters(array $data): array
+    {
+        return isset($data['filter']) ? array_map(
+            fn ($key) => method_exists(Task::class, Str::camel($key)) ?
+                AllowedFilter::scope($key) : AllowedFilter::exact($key),
+            array_keys($data['filter'])
+        ) : [];
     }
 }
