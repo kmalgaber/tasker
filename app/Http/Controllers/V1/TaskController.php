@@ -14,9 +14,15 @@ use App\Models\Task;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
+use Throwable;
 
 class TaskController extends Controller
 {
+    /**
+     * List tasks in a paginated format
+     *
+     * Can accept filtering/sorting parameters.
+     */
     public function index(IndexRequest $request, SearchTask $action): ResourceCollection
     {
         Gate::authorize('viewAny', Task::class);
@@ -27,6 +33,9 @@ class TaskController extends Controller
         return TaskResource::collection($action->execute($data));
     }
 
+    /**
+     * Create a new task
+     */
     public function store(CreateRequest $request, CreateTask $action): TaskResource
     {
         Gate::authorize('create', Task::class);
@@ -36,6 +45,9 @@ class TaskController extends Controller
         return new TaskResource($task);
     }
 
+    /**
+     * Get the task in detail
+     */
     public function show(Task $task): TaskResource
     {
         Gate::authorize('view', $task);
@@ -43,15 +55,30 @@ class TaskController extends Controller
         return new TaskResource($task);
     }
 
+    /**
+     * Update the specified task
+     */
     public function update(UpdateRequest $request, Task $task, UpdateTask $action): TaskResource
     {
         Gate::authorize('update', $task);
 
-        $task = $action->execute($task, $request->validated());
+        try {
+            $task = $action->execute($task, $request->validated());
+        } catch (Throwable $e) {
+            activity()
+                ->causedBy(auth()->user())
+                ->event('error')
+                ->performedOn($task)
+                ->withProperties($request->all())
+                ->log($e);
+        }
 
         return new TaskResource($task);
     }
 
+    /**
+     * Soft delete the task
+     */
     public function destroy(Task $task): Response
     {
         Gate::authorize('delete', $task);
@@ -61,6 +88,11 @@ class TaskController extends Controller
         return response()->noContent();
     }
 
+    /**
+     * Restore the soft-deleted task
+     *
+     * Only for admins.
+     */
     public function restore(Task $task): TaskResource
     {
         Gate::authorize('restore', $task);

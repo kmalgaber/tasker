@@ -21,18 +21,21 @@ class IndexRequest extends FormRequest
             'filter.text' => 'string',
             'filter.status' => [Rule::enum(TaskStatus::class)],
             'filter.priority' => [Rule::enum(TaskPriority::class)],
-            'filter.assignee_id' => 'exists:users,id', 'filter.due_date_before' => [
-                'nullable', 'date',
+            'filter.assignee_id' => 'uuid|exists:users,id',
+            'filter.due_date_before' => [
+                'date',
                 Rule::when($this->filled('filter.due_date_after'), 'after_or_equal:filter.due_date_after'),
             ],
             'filter.due_date_after' => [
-                'nullable', 'date',
+                'date',
                 Rule::when($this->filled('filter.due_date_before'), 'before_or_equal:filter.due_date_before'),
             ],
             'filter.tags.*' => 'exists:tags,name',
             /** Admins can request for deleted records */
             'filter.trashed' => 'in:only,with',
             'sort' => 'in:title,-title,due_date,-due_date,created_at,-created_at',
+            'page' => 'integer',
+            'per_page' => 'integer',
         ];
     }
 }

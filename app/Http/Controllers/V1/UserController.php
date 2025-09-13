@@ -11,7 +11,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 class UserController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * List users in a paginated format
      */
     public function index(IndexRequest $request, SearchUser $action): ResourceCollection
     {

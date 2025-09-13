@@ -5,6 +5,7 @@ namespace App\Http\Requests\V1\Tag;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
+/** @schemaName UpdateTagRequest */
 class UpdateRequest extends FormRequest
 {
     /**
@@ -15,6 +16,7 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
+            /** @example #1289ef */
             'color' => 'required|hex_color',
         ];
     }

@@ -5,6 +5,7 @@ namespace App\Http\Requests\V1\Tag;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
+/** @schemaName CreateTagRequest */
 class CreateRequest extends FormRequest
 {
     /**
@@ -15,7 +16,8 @@ class CreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:12',
+            'name' => 'required|string|min:3|max:12',
+            /** @example #1289ef */
             'color' => 'hex_color',
         ];
     }

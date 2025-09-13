@@ -25,10 +25,14 @@ class TaskResource extends JsonResource
             'status' => $this->status,
             'priority' => $this->priority,
             /** @format date */
-            'due_date' => $this->due_date?->format('Y-m-d'),
-            'assignee' => new UserResource($this->assignee),
+            'due_date' => $this->whenNotNull($this->due_date?->format('Y-m-d'), null),
+            'assignee' => $this->whenNotNull(new UserResource($this->assignee), null),
             'tags' => TagResource::collection($this->tags),
-            /** @format date-time */
+            /**
+             * Visible to admins only
+             *
+             * @format date-time
+             */
             'deleted_at' => $this->when(auth()->user()->is_admin ?? false, $this->deleted_at?->toRfc3339String()),
         ];
     }
@@ -44,7 +48,7 @@ class TaskResource extends JsonResource
                 /** @format date-time */
                 'created_at' => $this->created_at?->toRfc3339String(),
                 /** @format date-time */
-                'updated_at' => $this->updated_at?->toRfc3339String(),
+                'updated_at' => $this->whenNotNull($this->updated_at?->toRfc3339String(), null),
                 'metadata' => $this->metadata,
             ],
         ];

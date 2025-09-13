@@ -15,7 +15,9 @@ class IndexRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'search' => 'string',
+            'search' => 'required|string',
+            'page' => 'integer',
+            'per_page' => 'integer',
         ];
     }
 }

@@ -8,6 +8,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+/** @schemaName CreateTaskRequest */
 class CreateRequest extends FormRequest
 {
     /**
@@ -18,7 +19,7 @@ class CreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|min:5',
+            'title' => 'required|string|min:5|max:120',
             'description' => 'string',
             'status' => [Rule::enum(TaskStatus::class)],
             'priority' => [Rule::enum(TaskPriority::class)],

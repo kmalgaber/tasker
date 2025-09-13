@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Gate;
 class TagController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * List all tags
      */
     public function index(): ResourceCollection
     {
@@ -26,7 +26,9 @@ class TagController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Create a new tag
+     *
+     * Only for admins.
      */
     public function store(CreateRequest $request, CreateTag $action): TagResource
     {
@@ -38,7 +40,9 @@ class TagController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Set a new color for the specified tag
+     *
+     * Only for admins.
      */
     public function update(UpdateRequest $request, Tag $tag, UpdateTag $action): TagResource
     {
@@ -50,7 +54,9 @@ class TagController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Permanently delete the tag
+     *
+     * Only for admins.
      */
     public function destroy(Tag $tag): Response
     {

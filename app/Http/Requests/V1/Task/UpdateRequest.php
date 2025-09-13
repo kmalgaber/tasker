@@ -7,6 +7,7 @@ use App\Enums\TaskStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+/** @schemaName UpdateTaskRequest */
 class UpdateRequest extends FormRequest
 {
     /**

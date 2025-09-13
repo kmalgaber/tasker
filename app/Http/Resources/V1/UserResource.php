@@ -26,7 +26,7 @@ class UserResource extends JsonResource
             'email' => $this->email,
             /** @format date-time */
             // @phpstan-ignore-next-line
-            'email_verified_at' => $this->email_verified_at?->toRfc3339String(),
+            'email_verified_at' => $this->whenNotNull($this->email_verified_at?->toRfc3339String(), null),
             /** @format uri */
             'avatar' => $this->avatar,
             'is_admin' => $this->is_admin,
