@@ -4,6 +4,8 @@
         {
             "id": "6daab073-63fd-4d0d-b503-d2901af4f56a",
             "username": "user",
+            "firstName" : "Test",
+            "lastName" : "User",
             "email": "user@example.com",
             "emailVerified": true,
             "enabled": true,
@@ -24,6 +26,8 @@
         {
             "id": "6daab073-63fd-4d0d-b503-d2901af4f57b",
             "username": "user2",
+            "firstName" : "Another",
+            "lastName" : "User",
             "email": "anotheruser@example.com",
             "emailVerified": true,
             "enabled": true,
@@ -44,6 +48,8 @@
         {
             "id": "6daab073-63fd-4d0d-b503-d2901af4f56b",
             "username": "admin",
+            "firstName" : "Admin",
+            "lastName" : "User",
             "email": "admin@example.com",
             "emailVerified": true,
             "enabled": true,

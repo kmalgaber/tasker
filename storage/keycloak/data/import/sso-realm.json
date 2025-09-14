@@ -5,9 +5,13 @@
         {
             "id": "ec46675f-ee3e-49aa-85c1-c3f6893f893a",
             "clientId": "web",
+            "name": "Web Client",
+            "description" : "Public client for the web application",
             "enabled": true,
             "publicClient": true,
-            "protocol": "openid-connect"
+            "protocol": "openid-connect",
+            "rootUrl" : "${APP_URL}",
+            "redirectUris" : [ "/*" ]
         }
     ],
     "smtpServer": {
