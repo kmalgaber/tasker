@@ -14,6 +14,7 @@
         "devadamlar/laravel-oidc": "^1.1",
         "http-interop/http-factory-guzzle": "^1.2",
         "laravel/framework": "^12.0",
+        "laravel/horizon": "^5.33",
         "laravel/reverb": "^1.0",
         "laravel/scout": "^10.19",
         "laravel/tinker": "^2.10.1",

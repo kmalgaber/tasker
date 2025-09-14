@@ -71,7 +71,7 @@ services:
         command:
             - php
             - artisan
-            - 'queue:listen'
+            - horizon
         extra_hosts:
             - 'host.docker.internal:host-gateway'
             - '${APP_DOMAIN}:host-gateway'
