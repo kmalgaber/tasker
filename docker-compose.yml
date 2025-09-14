@@ -30,7 +30,7 @@ services:
             - meilisearch
         volumes:
             - '.:/var/www/html'
-            - '~/.sail/ca.pem:/usr/local/share/ca-certificates/ca.crt'
+            - '~/.sail/ca/ca.pem:/usr/local/share/ca-certificates/ca.crt'
         networks:
             - sail
     cron:
@@ -56,7 +56,7 @@ services:
             IGNITION_LOCAL_SITES_PATH: '${PWD}'
         volumes:
             - '.:/var/www/html'
-            - '~/.sail/ca.pem:/usr/local/share/ca-certificates/ca.crt'
+            - '~/.sail/ca/ca.pem:/usr/local/share/ca-certificates/ca.crt'
         networks:
             - sail
     queue:
@@ -83,7 +83,7 @@ services:
             IGNITION_LOCAL_SITES_PATH: '${PWD}'
         volumes:
             - '.:/var/www/html'
-            - '~/.sail/ca.pem:/usr/local/share/ca-certificates/ca.crt'
+            - '~/.sail/ca/ca.pem:/usr/local/share/ca-certificates/ca.crt'
         networks:
             - sail
     nginx:
@@ -134,12 +134,12 @@ services:
         build:
             context: ./vendor/elnurvl/sail-plugin/runtimes/keycloak
         volumes:
-            - './storage/logs/keycloak:/opt/keycloak/data/logs'
+            - './storage/logs/keycloak:/opt/keycloak/data/log'
             - './storage/keycloak/data/import:/opt/keycloak/data/import'
             - './storage/keycloak/conf:/opt/keycloak/conf'
             - './storage/keycloak/themes:/opt/keycloak/themes'
             - './storage/app/certs:/etc/x509/https'
-            - '~/.sail:/opt/keycloak/conf/truststores'
+            - '~/.sail/ca:/opt/keycloak/conf/truststores'
         command:
             - start-dev
             - '--import-realm'
@@ -201,7 +201,7 @@ services:
             IGNITION_LOCAL_SITES_PATH: '${PWD}'
         volumes:
             - '.:/var/www/html'
-            - '~/.sail/ca.pem:/usr/local/share/ca-certificates/ca.crt'
+            - '~/.sail/ca/ca.pem:/usr/local/share/ca-certificates/ca.crt'
         networks:
             - sail
     mailpit:
