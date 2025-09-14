@@ -1,12 +1,9 @@
 @echo off
 setlocal
 
-if "%~1"=="" (
-  echo Usage: %~nx0 domain
-  exit /b 1
-)
+for /f "tokens=*" %%i in (.env) do set %%i
 
-set DOMAIN=%1
+set DOMAIN=%APP_DOMAIN%
 set BASE_DIR=%~dp0
 set SSL_DIR=%BASE_DIR%certs
 set CA_DIR=%USERPROFILE%\.sail\ca
@@ -21,11 +18,6 @@ set CONFIG_FILE=%SSL_DIR%\openssl.cnf
 if not exist "%SSL_DIR%" mkdir "%SSL_DIR%"
 if not exist "%CA_DIR%" mkdir "%CA_DIR%"
 
-if exist "%SERVER_CERT%" if exist "%SERVER_KEY%" (
-  echo Server cert and key already exist.
-  exit /b 0
-)
-
 if not exist "%CA_KEY%" (
   openssl genrsa -out "%CA_KEY%" 2048
   set SUBJECT=/CN=Laravel Sail CA Self Signed CN/O=Laravel Sail CA Self Signed Organization/OU=Developers/emailAddress=rootcertificate@laravel.sail
@@ -35,6 +27,11 @@ if not exist "%CA_KEY%" (
 )
 
 openssl genrsa -out "%SERVER_KEY%" 2048
+
+if exist "%SERVER_CERT%" if exist "%SERVER_KEY%" (
+  echo Server cert and key already exist at %SSL_DIR%
+  exit /b 0
+)
 
 (
 echo [req]

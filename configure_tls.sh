@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-DOMAIN=$1
+source .env
+
+DOMAIN=$APP_DOMAIN
 BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
 SSL_DIR="$BASE_DIR/storage/app/certs"
 CA_DIR="$HOME/.sail/ca"
@@ -15,32 +17,32 @@ CONFIG_FILE="$SSL_DIR/openssl.cnf"
 
 mkdir -p "$SSL_DIR" "$CA_DIR"
 
-if [[ -f "$SERVER_CERT" && -f "$SERVER_KEY" ]]; then
-  echo "Server cert and key already exist."
-  exit 0
-fi
-
 if [[ ! -f "$CA_KEY" || ! -f "$CA_CERT" ]]; then
   openssl genrsa -out "$CA_KEY" 2048
   SUBJECT="/CN=Laravel Sail CA Self Signed CN/O=Laravel Sail CA Self Signed Organization/OU=Developers/emailAddress=rootcertificate@laravel.sail"
   openssl req -x509 -new -nodes -key "$CA_KEY" -sha256 -days 3650 -out "$CA_CERT" -subj "$SUBJECT"
   echo "CA generated and placed at $CA_CERT"
+fi
 
-  case "$(uname -s)" in
-    Darwin)
-      sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain "$CA_CERT"
-      ;;
-    Linux)
-      DISTRO=$(grep ^ID= /etc/os-release | cut -d= -f2 | tr -d '"')
-      if [[ "$DISTRO" =~ (ubuntu|debian) ]]; then
-        sudo cp "$CA_CERT" /usr/local/share/ca-certificates/laravel_sail_ca.crt
-        sudo update-ca-certificates
-      elif [[ "$DISTRO" =~ (centos|fedora|rhel|rocky|almalinux) ]]; then
-        sudo cp "$CA_CERT" /etc/pki/ca-trust/source/anchors/laravel_sail_ca.crt
-        sudo update-ca-trust extract
-      fi
-      ;;
-  esac
+case "$(uname -s)" in
+Darwin)
+  sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain "$CA_CERT"
+  ;;
+Linux)
+  DISTRO=$(grep ^ID= /etc/os-release | cut -d= -f2 | tr -d '"')
+  if [[ "$DISTRO" =~ (ubuntu|debian) ]]; then
+    sudo cp "$CA_CERT" /usr/local/share/ca-certificates/laravel_sail_ca.crt
+    sudo update-ca-certificates
+  elif [[ "$DISTRO" =~ (centos|fedora|rhel|rocky|almalinux) ]]; then
+    sudo cp "$CA_CERT" /etc/pki/ca-trust/source/anchors/laravel_sail_ca.crt
+    sudo update-ca-trust extract
+  fi
+  ;;
+esac
+
+if [[ -f "$SERVER_CERT" && -f "$SERVER_KEY" ]]; then
+  echo "Server cert and key already exist at "$SSL_DIR
+  exit 0
 fi
 
 openssl genrsa -out "$SERVER_KEY" 2048
