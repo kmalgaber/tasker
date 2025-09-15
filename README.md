@@ -233,3 +233,9 @@ Log files can be found at `storage/logs/keycloak`.
 
 Mailpit is a mail testing tool for developers. It catches all outgoing emails and allows you to view them in a web interface.
 You can access the Mailpit web interface at `/mail`.
+
+## Horizon
+
+Horizon is a queue management system for Laravel applications.
+Queues are used to index tasks in the background for full text search functionality.
+You can access the dashboard at `/horizon`.
