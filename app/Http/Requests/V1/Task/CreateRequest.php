@@ -23,7 +23,7 @@ class CreateRequest extends FormRequest
             'description' => 'string',
             'status' => [Rule::enum(TaskStatus::class)],
             'priority' => [Rule::enum(TaskPriority::class)],
-            'due_date' => 'date_format:Y-m-d|after:today',
+            'due_date' => 'date_format:Y-m-d|after_or_equal:today',
             'assignee_id' => 'uuid|exists:users,id',
             'tags' => 'array|list',
             'tags.*' => 'exists:tags,name',
