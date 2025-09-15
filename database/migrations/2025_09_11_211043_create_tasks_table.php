@@ -17,9 +17,9 @@ return new class extends Migration
             $table->foreignIdFor(User::class)->constrained();
             $table->string('title');
             $table->text('description')->nullable();
-            $table->string('status');
-            $table->string('priority');
-            $table->date('due_date')->nullable();
+            $table->string('status')->index();
+            $table->string('priority')->index();
+            $table->date('due_date')->nullable()->index();
             $table->foreignIdFor(User::class, 'assignee_id')->nullable()->constrained();
             $table->json('metadata')->nullable();
             $table->softDeletes();
