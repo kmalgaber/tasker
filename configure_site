@@ -1,0 +1,178 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+print_help() {
+    cat <<EOT
+Usage: $0 [OPTIONS]
+
+Options:
+  --ca-dir=DIR     Specify custom directory for CA key pair (default: \$HOME/.sail/ca)
+  --nosudo         Skip privileged commands (CA installation and hosts modification)
+  -h, --help       Show this help message and exit
+EOT
+}
+
+check_cert_expiry() {
+    local CERT_PATH="$1"
+    CERT_EXPIRED=true
+
+    [[ ! -f "$CERT_PATH" ]] && return
+
+    EXP_STR=$(openssl x509 -enddate -noout -in "$CERT_PATH" | cut -d= -f2)
+    [[ -z "$EXP_STR" ]] && return
+    EXPIRES_AT="Expires on $EXP_STR"
+
+    if [[ "$(uname)" == "Darwin" ]]; then
+        EXP_TS=$(date -j -f "%b %d %T %Y %Z" "$EXP_STR" +%s)
+    else
+        EXP_TS=$(date -d "$EXP_STR" +%s)
+    fi
+
+    [[ "$EXP_TS" -ge "$(date +%s)" ]] && CERT_EXPIRED=false
+}
+
+source .env
+
+CA_DIR="$HOME/.sail/ca"
+NOSUDO=false
+
+# You can provide another location for the Certificate Authority with --ca-dir option
+for arg in "$@"; do
+    case $arg in
+        -h|--help)
+            print_help
+            exit 0
+            ;;
+        --ca-dir=*)
+            CA_DIR="$(eval echo "${arg#*=}")"
+            shift
+            ;;
+        --nosudo)
+            NOSUDO=true
+            shift
+            ;;
+    esac
+done
+
+BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
+SSL_DIR="$BASE_DIR/storage/app/certs"
+DOMAIN=$APP_DOMAIN
+
+CA_KEY="$CA_DIR/ca.key"
+CA_CERT="$CA_DIR/ca.pem"
+SERVER_KEY="$SSL_DIR/server.key"
+SERVER_CSR="$SSL_DIR/server.csr"
+SERVER_CERT="$SSL_DIR/server.crt"
+CONFIG_FILE="$SSL_DIR/openssl.cnf"
+CA_RENEWED=false
+CERT_EXPIRED=false
+DOMAIN_CHANGED=false
+
+CA_NAME="Laravel Sail"
+CA_EMAIL="rootcertificate@laravel.sail"
+CA_CN="$CA_NAME CA Self Signed CN"
+CA_ORGANIZATION="$CA_NAME CA Self Signed Organization"
+CA_ORGANIZATION_UNIT=Developers
+
+mkdir -p "$SSL_DIR" "$CA_DIR"
+
+check_cert_expiry "$CA_CERT"
+
+if [[ ! -f "$CA_KEY" || ! -f "$CA_CERT" || "$CERT_EXPIRED" == true ]]; then
+    openssl genrsa -out "$CA_KEY" 2048
+    SUBJECT="/CN=$CA_CN/O=$CA_ORGANIZATION/OU=$CA_ORGANIZATION_UNIT/emailAddress=$CA_EMAIL"
+    openssl req -x509 -new -nodes -key "$CA_KEY" -sha256 -days 3650 -out "$CA_CERT" -subj "$SUBJECT"
+    CA_RENEWED=true
+    check_cert_expiry "$CA_CERT"
+    echo "CA generated and placed at $CA_CERT. $EXPIRES_AT"
+fi
+
+if [[ "$CA_RENEWED" == false ]]; then
+    echo "CA already exists at $CA_CERT. $EXPIRES_AT"
+fi
+
+if [[ "$NOSUDO" == false ]]; then
+    # Requires elevated privileges
+    if grep -qEi "(Microsoft|WSL)" /proc/version 2>/dev/null || [[ -n "${WSL_DISTRO_NAME-}" ]]; then
+        WIN_CA_PATH=$(wslpath -w "$CA_CERT")
+        ENTRY="127.0.0.1 $APP_DOMAIN"
+        HOSTS_FILE="C:\\Windows\\System32\\drivers\\etc\\hosts"
+
+        powershell.exe -NoProfile -Command "Start-Process powershell -Verb RunAs -ArgumentList '-NoProfile', '-Command', {
+            if (-not (Select-String -Path '$HOSTS_FILE' -Pattern '$ENTRY' -SimpleMatch)) {
+                Add-Content -Path '$HOSTS_FILE' -Value '$ENTRY'
+            }
+            Import-Certificate -FilePath '$WIN_CA_PATH' -CertStoreLocation 'Cert:\LocalMachine\Root'
+        }"
+        echo "$CA_NAME Certificate Authority has been added to the Trusted Root Certification Authorities store."
+    else
+        HOSTS_FILE="/etc/hosts"
+        if ! grep -Fxq "127.0.0.1 $APP_DOMAIN" "$HOSTS_FILE"; then
+            echo "Adding $APP_DOMAIN -> 127.0.0.1 to $HOSTS_FILE"
+            sudo sh -c "echo '127.0.0.1 $APP_DOMAIN' >> '$HOSTS_FILE'"
+        fi
+
+        OS_NAME="$(uname -s)"
+        if [[ "$OS_NAME" == "Darwin" ]]; then
+            if ! security verify-cert -c "$CA_CERT" >/dev/null 2>&1; then
+                sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain "$CA_CERT"
+                echo "$CA_NAME Certificate Authority has been added to the System Keychain"
+            fi
+        elif [[ "$OS_NAME" == "Linux" ]]; then
+            DISTRO=$(grep ^ID= /etc/os-release | cut -d= -f2 | tr -d '"')
+            if [[ "$DISTRO" =~ (ubuntu|debian) ]]; then
+                if ! grep -Fxq "$(openssl x509 -noout -fingerprint -in "$CA_CERT")" /etc/ssl/certs/ca-certificates.crt 2>/dev/null; then
+                    sudo cp "$CA_CERT" /usr/local/share/ca-certificates/laravel_sail_ca.crt
+                    sudo update-ca-certificates
+                    echo "$CA_NAME Certificate Authority has been added to the system truststore"
+                fi
+            elif [[ "$DISTRO" =~ (centos|fedora|rhel|rocky|almalinux) ]]; then
+                if ! grep -Fxq "$(openssl x509 -noout -fingerprint -in "$CA_CERT")" /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem 2>/dev/null; then
+                    sudo cp "$CA_CERT" /etc/pki/ca-trust/source/anchors/laravel_sail_ca.crt
+                    sudo update-ca-trust extract
+                    echo "$CA_NAME Certificate Authority has been added to the system truststore"
+                fi
+            fi
+        fi
+    fi
+fi
+
+if [[ -f "$SERVER_CERT" ]]; then
+    check_cert_expiry "$SERVER_CERT"
+    CN=$(openssl x509 -noout -subject -in "$SERVER_CERT" | sed -E 's/ *= */=/g' | sed -n 's/.*CN=\([^,\/]*\).*/\1/p')
+    if [[ "$CN" != "$APP_DOMAIN" ]]; then
+        DOMAIN_CHANGED=true
+    fi
+fi
+
+if [[ -f "$SERVER_KEY" && "$CA_RENEWED" == false && "$CERT_EXPIRED" == false && "$DOMAIN_CHANGED" == false ]]; then
+    echo "Server cert and key already exist at $SSL_DIR. $EXPIRES_AT"
+    exit 0
+fi
+
+openssl genrsa -out "$SERVER_KEY" 2048
+
+SAN="DNS:$DOMAIN,DNS:*.$DOMAIN,DNS:localhost,DNS:mailpit,DNS:keycloak"
+cat > "$CONFIG_FILE" <<EOT
+[req]
+distinguished_name = req_distinguished_name
+req_extensions = v3_req
+prompt = no
+
+[req_distinguished_name]
+CN = $DOMAIN
+
+[v3_req]
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName = $SAN
+EOT
+
+openssl req -new -key "$SERVER_KEY" -out "$SERVER_CSR" -config "$CONFIG_FILE"
+openssl x509 -req -in "$SERVER_CSR" -CA "$CA_CERT" -CAkey "$CA_KEY" -CAcreateserial \
+    -out "$SERVER_CERT" -days 365 -sha256 -extfile "$CONFIG_FILE" -extensions v3_req 2>/dev/null
+
+check_cert_expiry "$SERVER_CERT"
+
+echo "Generated TLS certificates at $SSL_DIR. $EXPIRES_AT"
+rm -f "$SERVER_CSR" "$CONFIG_FILE"

@@ -3,7 +3,7 @@
 This is a resource-based API server for **Tasker**, a simple task management platform, built with Laravel
 to demonstrate tools and techniques used in professional product development workflows.
 
-The API is fully compliant with *OpenAPI 3.1* standard: you can access the documentation at `/docs/api`.
+The API is fully compliant with *OpenAPI 3.1* standard: you can access the documentation at `https://tasker.test/docs/api`.
 The page provides an option to download the specification file, so you can import it into Postman to generate the collection
 or use it to generate the client code of corresponding web/mobile applications.
 
@@ -12,7 +12,7 @@ The project uses [Keycloak](#keycloak) as an *authorization server*, therefore,
 the *resource server* (the Laravel application) will not store user credentials nor issue any kind of authorization token.
 You need to send a bearer token issued by the authorization server in the `Authorization` header of requests to the resource server.
 To obtain the token you can use [Authorization Code with PKCE](https://datatracker.ietf.org/doc/html/rfc7636) flow for the client ID `web`.
-OpenID Connect Discovery document can be found at `/auth/realms/sso/.well-known/openid-configuration`
+OpenID Connect Discovery document can be found at `https://tasker.test/auth/realms/sso/.well-known/openid-configuration`
 
 ---
 
@@ -38,25 +38,11 @@ and helping with the translation. This disclosure will be kept updated to reflec
     eval "$(/opt/homebrew/bin/brew shellenv)"
     ```
 
-Open **Terminal** and run the below commands:
+Open **Terminal** and run the below command to install Docker:
+```shell
+brew install --cask docker
+```
 
-1. Install Git Credentials Manager:
-    ```shell
-    brew install --cask git-credential-manager
-    ```
-
-2. Install Docker:
-    ```shell
-    brew install --cask docker
-    ```
-
-3. Set temporary environment variables to store the location of profile and hosts files which will be used in the later steps:
-    ```shell
-    PROFILE=~/.zprofile
-    HOSTS=/private/etc/hosts
-    ```
-   _Note: This command, along with everything that follows, should be executed within a single terminal session.
-   The above variables will need to be redefined if a new session is initiated._
 ---
 ### Windows
 
@@ -71,13 +57,10 @@ Open **Terminal** and run the below commands:
 
 Open **Terminal**(or **PowerShell** if you don't have it) and run the below commands:
 
-
-1. **Install Git on Windows:**
+1. **Install OpenSSL:**
    ```shell
-   winget install --id Git.Git -e --source winget
+   winget install FireDaemon.OpenSSL
    ```
-   *Note: Installing Git on your host OS is necessary, even if Ubuntu distro comes with Git, to enable credential saving.*
-
 2. **Install WSL and Ubuntu Distro:**
    ```shell
    wsl --install
@@ -97,13 +80,9 @@ Open **Terminal**(or **PowerShell** if you don't have it) and run the below comm
    ```
    Enable the WSL2 engine following the instructions [here](https://docs.docker.com/desktop/wsl/#turn-on-docker-desktop-wsl-2).
 
-4. Set temporary environment variables to store the location of profile and hosts files which will be used in the later steps:
-    ```shell
-    PROFILE=~/.profile
-    HOSTS=/mnt/c/Windows/System32/drivers/etc/hosts
-    ```
-   _Note: This command, along with everything that follows, should be executed in the Ubuntu shell, within a single terminal session.
-   The above variables will need to be redefined if a new session is initiated._
+**From this point onward, all commands must be run from within the Ubuntu WSL Terminal.**
+
+---
 
 ## Installing the project
 
@@ -130,19 +109,6 @@ cd tasker
   cp .env.example .env
   ```
 
-### Network configuration:
-- To enable access to the web server from the browser via the configured domain,
-  add an entry for `APP_DOMAIN`(in our case, `tasker.test`) in the **hosts** file:
-    ```shell
-    echo -e '127.0.0.1 tasker.test' | sudo tee -a $HOSTS
-    ```
-  _Note: If you get a permission error, try to open the $HOSTS file in an admin-privileged text editor and
-  add the string in the quotes as a new line manually._
-
-  _Note: To use a different domain, change `APP_DOMAIN` in `.env`
-  before reapplying the [Configuring TLS](#configuring-tls) step._
-
-
 - Create a Docker network for communication between the projects:
   ```shell
   docker network create tasker
@@ -150,47 +116,37 @@ cd tasker
 
 ### Installing the dependencies
 
-1. Create and start containers:
+1. Install the packages
+    ```shell
+    docker run --rm --interactive --tty --volume $PWD:/app composer --ignore-platform-reqs install
+    ```
+2. Create and start containers:
     ```shell
     docker compose up -d
     ```
-
-2. Install the packages:
-   ```shell
-   docker compose exec -u sail laravel.test composer install
-   ```
-3. Restart the containers:
-    ```shell
-    docker compose restart
-    ```
-4. Link local storage:
+3. Link local storage:
     ```shell
     docker compose exec -u sail laravel.test php artisan storage:link
     ```
+4. Run the migrations and seed the database:
+    ```shell
+    docker compose exec -u sail laravel.test php artisan migrate:fresh --seed
+    ```
 
-### Configuring TLS
-You need to generate TLS certificates signed with a system-trusted CA to access the API with HTTPS.
+### Configuring the site
+To access the API server locally, you need to add an entry for `APP_DOMAIN` in the **hosts** file
+and generate TLS certificates signed with a system-trusted CA (for HTTPS).
+Both of these require elevated privileges.
 
-**Mac or Linux:**
 ```shell
-chown +x configure_tls.sh
-./configure_tls.sh
-docker compose restart nginx
+chmod +x configure_site
+./configure_site
+docker compose up -d --force-recreate
 ```
 
-**Windows(needs to be run from PowerShell):**
-```shell
-./configure_tls.bat
-docker compose restart nginx
-```
+After completing the above steps the API server should be available at the configured `APP_DOMAIN`.
 
-### Database
-Run the migrations and seed the database:
-```shell
-docker compose exec -u sail laravel.test php artisan migrate:fresh --seed
-```
-
-After completing the above steps the API is ready to use.
+_Note: To use a different domain, change `APP_DOMAIN` in `.env` before running the above command._
 
 ---
 ## Keycloak
@@ -198,7 +154,7 @@ After completing the above steps the API is ready to use.
 Keycloak is an open-source Identity and Access Management (IAM) solution,
 responsible for issuing authorization tokens defined by OpenID Connect protocol.
 
-You can access the Keycloak admin console at `/auth` endpoint with the following credentials:
+You can access the Keycloak admin console at `https://tasker.test/auth` endpoint with the following credentials:
 
 ```
 username: admin
@@ -232,10 +188,10 @@ Log files can be found at `storage/logs/keycloak`.
 ## Mailpit
 
 Mailpit is a mail testing tool for developers. It catches all outgoing emails and allows you to view them in a web interface.
-You can access the Mailpit web interface at `/mail`.
+You can access the Mailpit web interface at `https://tasker.test/mail`.
 
 ## Horizon
 
 Horizon is a queue management system for Laravel applications.
 Queues are used to index tasks in the background for full text search functionality.
-You can access the dashboard at `/horizon`.
+You can access the dashboard at `https://tasker.test/horizon`.
