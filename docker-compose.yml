@@ -135,9 +135,9 @@ services:
             context: ./vendor/elnurvl/sail-plugin/runtimes/keycloak
         volumes:
             - './storage/logs/keycloak:/opt/keycloak/data/log'
-            - './storage/keycloak/data/import:/opt/keycloak/data/import'
-            - './storage/keycloak/conf:/opt/keycloak/conf'
-            - './storage/keycloak/themes:/opt/keycloak/themes'
+            - './database/seeders/keycloak:/opt/keycloak/data/import'
+            - './database/keycloak:/opt/keycloak/data/h2'
+            - './resources/keycloak:/opt/keycloak/themes'
             - './storage/app/certs:/etc/x509/https'
             - '~/.sail/ca:/opt/keycloak/conf/truststores'
         command:

@@ -11,7 +11,7 @@ or use it to generate the client code of corresponding web/mobile applications.
 The project uses [Keycloak](#keycloak) as an *authorization server*, therefore,
 the *resource server* (the Laravel application) will not store user credentials nor issue any kind of authorization token.
 You need to send a bearer token issued by the authorization server in the `Authorization` header of requests to the resource server.
-To obtain the token you can use [Authorization Code with PKCE](https://datatracker.ietf.org/doc/html/rfc7636) flow for the client ID `web`.
+To obtain the token you can use [Authorization Code with PKCE](https://datatracker.ietf.org/doc/html/rfc7636) with `client_id:web`.
 OpenID Connect Discovery document can be found at `https://tasker.test/auth/realms/sso/.well-known/openid-configuration`
 
 ---
@@ -99,7 +99,7 @@ cd tasker
 
 - Add the following variables to the profile if they are missing:
   ```shell
-  echo "export WWWUSER=$UID WWWGROUP=$(id -g)" >> $PROFILE && source $PROFILE && env | grep -E 'WWW'
+  PROFILE="${HOME}/.${SHELL##*/}rc"; grep -Eq 'WWWUSER=|WWWGROUP=' "$PROFILE" || echo "export WWWUSER=$UID WWWGROUP=$(id -g)" >> "$PROFILE" && source "$PROFILE" && env | grep -E 'WWW'
   ```
   These variables match the container's user and group IDs with the host for consistent file permissions.
 
@@ -136,7 +136,7 @@ cd tasker
 ### Configuring the site
 To access the API server locally, you need to add an entry for `APP_DOMAIN` in the **hosts** file
 and generate TLS certificates signed with a system-trusted CA (for HTTPS).
-Both of these require elevated privileges.
+Both of these can be achieved by running the below script and require elevated privileges.
 
 ```shell
 chmod +x configure_site
@@ -161,28 +161,17 @@ username: admin
 password: password
 ```
 
-The project already defines a minimal realm configuration out of the box.
-The realm managing the users and authorization tokens for the API application is `sso`.
-It will be reset to the default configuration everytime the `keycloak` compose service is recreated.
+### Seeding
+The realm managing users and authorization tokens for the API application is `sso`.
+The project already defines a minimal realm configuration out of the box. Password for all users is `password`.
 
+To reset to the default configuration delete `sso` realm in the admin console and restart `keycloak` service:
 ```shell
-sail up keycloak -d --force-recreate
+docker compose restart keycloak
 ```
+_Note: Default realm configuration can be found at `database/seeders/keycloak`._
 
-**NOTE: Do not make any changes in the `master` realm unless absolutely necessary.**
-
-#### Configurations
-Realm configurations can be found in `storage/keycloak/data`.
-
-You can export realms with:
-
-```shell
-docker compose exec keycloak bin/kc.sh export --dir data
-```
-
-**Note: `data/import` directory should be reserved for default realm configurations.**
-
-#### Debugging
+### Debugging
 Log files can be found at `storage/logs/keycloak`.
 
 ## Mailpit
@@ -193,5 +182,5 @@ You can access the Mailpit web interface at `https://tasker.test/mail`.
 ## Horizon
 
 Horizon is a queue management system for Laravel applications.
-Queues are used to index tasks in the background for full text search functionality.
+This project uses queues to index tasks in the background for full text search functionality.
 You can access the dashboard at `https://tasker.test/horizon`.
